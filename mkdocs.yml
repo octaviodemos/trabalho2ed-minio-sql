@@ -1,0 +1,45 @@
+site_name: "Trabalho 2 — Engenharia de Dados"
+site_description: "Documentação do projeto: Spark, Delta Lake, MinIO e SQL Server"
+site_author: "Equipe Trabalho 2"
+
+theme:
+  name: material
+  language: pt-BR
+  palette:
+    - scheme: slate
+      primary: deep purple
+      accent: amber
+      toggle:
+        icon: material/weather-night
+        name: Modo claro
+    - scheme: default
+      primary: deep purple
+      accent: amber
+      toggle:
+        icon: material/weather-sunny
+        name: Modo escuro
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - content.code.copy
+    - content.code.annotate
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.tabbed:
+      alternate_style: true
+  - tables
+  - attr_list
+  - md_in_html
+
+nav:
+  - Início: index.md
+  - Arquitetura Medalhão: arquitetura_medallion.md
+  - Tabelas Gerenciadas vs Não Gerenciadas: tabelas_gerenciadas_vs_nao_gerenciadas.md
+  - Camada Bronze: camada_bronze.md
