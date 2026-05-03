@@ -1,0 +1,9 @@
+isbn_livro,email_membro,valor,pago,data_geracao
+978-85-3012-108-3,ana.paula.ferreira@email.com,12.50,0,2025-02-01
+978-85-3012-114-5,bruno.cardoso@email.com,35.00,1,2025-03-01
+978-85-3012-117-6,carla.m.rocha@email.com,8.75,0,2025-03-20
+978-85-3012-120-7,daniel.s.alves@email.com,42.30,0,2025-04-05
+978-85-3012-105-2,elisa.m.costa@email.com,15.00,1,2025-05-02
+978-85-3012-102-1,karina.o.santos@email.com,22.40,0,2024-03-25
+978-85-3012-111-4,lucas.h.moura@email.com,18.00,1,2024-05-05
+978-85-3012-113-8,mariana.c.freitas@email.com,50.00,0,2024-06-01

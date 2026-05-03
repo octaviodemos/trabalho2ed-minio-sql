@@ -1,17 +1,18 @@
 [project]
 name = "trabalho2ed-minio-sql"
 version = "0.1.0"
-description = "Projeto de Engenharia de Dados com Spark, Delta Lake e MinIO"
+description = "Projeto de Engenharia de Dados com Spark, Delta Lake, MinIO e SQL Server"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.11,<3.12"
 dependencies = [
-    "boto3",
-    "delta-spark",
-    "pyspark",
-    "taskipy",
+    "delta-spark==3.2.0",
+    "jupyterlab>=4.0.0",
+    "pandas>=2.2.0",
+    "pyodbc>=5.1.0",
+    "pyspark==3.5.3",
+    "python-dotenv>=1.0.0",
 ]
 
 [tool.taskipy.tasks]
-server = "jupyter lab"
-spark_shell = "python"
-clean = "rm -rf data/warehouse data/iceberg_warehouse data/delta_warehouse data/minio_warehouse warehouse metastore_db spark-warehouse site derby.log"
+notebook = "jupyter lab notebook/"
+jupyter = "jupyter lab notebook/"

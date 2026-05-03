@@ -9,7 +9,7 @@ dist/
 venv/
 env/
 .env
-.env.*
+!.env.example
 .ipynb_checkpoints/
 .pytest_cache/
 .mypy_cache/
