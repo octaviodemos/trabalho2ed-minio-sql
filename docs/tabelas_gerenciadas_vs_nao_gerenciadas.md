@@ -7,6 +7,8 @@ No ecossistema Spark + Delta Lake, existem dois tipos fundamentais de tabelas: *
 !!! info "Contexto do projeto"
     No nosso projeto **BibliotecaDb**, utilizamos **tabelas não gerenciadas** na camada Bronze, pois os dados ficam armazenados no MinIO (Object Storage S3) e precisamos de controle total sobre o ciclo de vida dos arquivos.
 
+No MinIO, as tabelas Delta são **externas ao catálogo padrão do Spark**: o armazenamento efetivo situa-se sob um prefixo `s3a://bronze/...` definido pelo projeto, sendo o motor responsável apenas por referenciar esse local. Tal configuração favorece a **persistência dos dados**, na medida em que os objetos (Parquet, `_delta_log`, *manifests*) permanecem no *bucket* após recriação de `SparkSession`, alteração de *cluster* ou remoção da entrada no catálogo, bastando reutilizar o mesmo URI para releitura ou *time travel*. Num cenário **gerido** no *warehouse* local, acumulam-se riscos de misturar dados efémeros de laboratório com o disco do *cluster* e de perda associada a `DROP TABLE` ou a desmantelamento de infraestrutura. No modelo **externo no MinIO**, o *object store* constitui a fonte de verdade durável: políticas de retenção, cópias de segurança e replicação aplicam-se diretamente aos ficheiros Delta, em linha com desenhos de *data lakehouse* em produção.
+
 ---
 
 ## Comparativo Geral
@@ -108,6 +110,10 @@ A saída incluirá:
 ## Tabela Não Gerenciada (External / Unmanaged Table)
 
 Uma tabela não gerenciada armazena os dados em um **caminho definido pelo usuário**. O catálogo do Spark mantém apenas uma referência (ponteiro) para esse caminho. Quando a tabela é removida com `DROP TABLE`, **apenas os metadados do catálogo são apagados** — os dados permanecem intactos no caminho original.
+
+### Persistência em `s3a://` e semântica do `DROP TABLE`
+
+Quando a `LOCATION` ou o `save()` apontam para um prefixo **S3A** no MinIO (por exemplo `s3a://bronze/dbo_Categoria/`), os ficheiros de dados Parquet, o diretório `_delta_log` e demais artefactos do Delta **residem no armazenamento objeto** (*object store*), não no disco local do processo Spark. Por conseguinte, um `DROP TABLE` executado no catálogo Spark **remove a entrada de catálogo** (e eventualmente metadados do *metastore*, conforme a configuração), mas **não invoca, por si só, a eliminação recursiva dos objetos no *bucket***: o conteúdo físico permanece acessível mediante nova `CREATE TABLE ... LOCATION` ou `DeltaTable.forPath` sobre o mesmo URI. Esta propriedade é central para a **governança e recuperação** em *data lakes*: desacopla o ciclo de vida do motor analítico do armazenamento duradouro, permitindo políticas de retenção, *backup* e auditoria ao nível do MinIO/S3.
 
 ### Criação — Exemplo com dados no MinIO (nosso projeto)
 

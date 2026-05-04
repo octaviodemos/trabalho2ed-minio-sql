@@ -2,11 +2,7 @@
 
 ## Objetivo
 
-A camada Bronze é a **primeira camada tipada** da Arquitetura Medalhão. Ela recebe os dados crus da Landing Zone (CSV) e os transforma em formato **Delta Lake** com:
-
-- **Schema enforcement**: tipagem forte aplicada na leitura
-- **Metadados de auditoria**: rastreabilidade da carga
-- **Formato transacional**: suporte a ACID, versionamento e time travel
+A camada Bronze corresponde à **primeira materialização tipada** da arquitetura medalhão. Os ficheiros CSV provenientes da *landing zone* são lidos pelo Spark com *schema enforcement*, enriquecidos com metadados de linhagem temporal e de ficheiro de origem, e persistidos em **Delta Lake** no MinIO, o que habilita transações ACID, versionamento e consultas de *time travel* sobre o histórico de versões.
 
 ## Pipeline
 
@@ -66,3 +62,86 @@ uv run jupyter lab notebook/
 
 !!! warning "Pré-requisito"
     Os notebooks `00_setup_sqlserver.ipynb` e `01_extracao_sqlserver_landing_zone.ipynb` devem ter sido executados com sucesso antes deste.
+
+---
+
+## DML na Bronze — exemplos do `dml_bronze.ipynb`
+
+Após a carga Delta no MinIO, o notebook `dml_bronze.ipynb` demonstra mutações sobre o caminho `s3a://bronze/dbo_Categoria/` e a leitura do registo transacional do Delta. Os excertos abaixo reproduzem a lógica principal; o caminho e a variável `novo_id` devem estar coerentes com a execução sequencial das células do notebook.
+
+### INSERT (registo sintético de validação)
+
+```python
+import pyspark.sql.functions as F
+
+BRONZE_TABLE_PATH = "s3a://bronze/dbo_Categoria/"
+df_atual = spark.read.format("delta").load(BRONZE_TABLE_PATH)
+proximo_id = df_atual.select(F.max(F.col("id_categoria")).alias("m")).first()["m"]
+base_id = int(proximo_id) if proximo_id is not None else 0
+novo_id = base_id + 1
+
+linha_nova = spark.range(1).select(
+    F.lit(novo_id).cast("int").alias("id_categoria"),
+    F.lit("Categoria fictícia (INSERT DML)").alias("nome"),
+    F.lit("Registro sintético para validar escrita ACID na Bronze.").alias("descricao"),
+    F.date_format(
+        F.current_timestamp(), "yyyy-MM-dd'T'HH:mm:ss.SSSSSS"
+    ).alias("_bronze_loaded_at"),
+    F.lit("dml_bronze.ipynb#INSERT").alias("_bronze_source_file"),
+)
+
+linha_nova.write.format("delta").mode("append").save(BRONZE_TABLE_PATH)
+```
+
+### UPDATE (correção pontual, `id_categoria = 1`)
+
+```python
+import pyspark.sql.functions as F
+from delta.tables import DeltaTable
+
+BRONZE_TABLE_PATH = "s3a://bronze/dbo_Categoria/"
+tabela_delta = DeltaTable.forPath(spark, BRONZE_TABLE_PATH)
+
+tabela_delta.update(
+    condition="id_categoria = 1",
+    set={
+        "descricao": F.lit(
+            "Descrição revisada na Bronze (UPDATE via DeltaTable)."
+        )
+    },
+)
+
+spark.read.format("delta").load(BRONZE_TABLE_PATH).filter(
+    F.col("id_categoria") == F.lit(1)
+).select("id_categoria", "nome", "descricao").show(truncate=False)
+```
+
+### DELETE (expurgo do identificador sintético)
+
+```python
+import pyspark.sql.functions as F
+from delta.tables import DeltaTable
+
+BRONZE_TABLE_PATH = "s3a://bronze/dbo_Categoria/"
+tabela_delta = DeltaTable.forPath(spark, BRONZE_TABLE_PATH)
+tabela_delta.delete(F.col("id_categoria") == F.lit(novo_id))
+```
+
+A variável `novo_id` corresponde ao identificador criado no bloco **INSERT** do mesmo fluxo de execução.
+
+### Auditoria — `history()`
+
+```python
+import pyspark.sql.functions as F
+from delta.tables import DeltaTable
+
+tabela_delta = DeltaTable.forPath(spark, "s3a://bronze/dbo_Categoria/")
+tabela_delta.history().select(
+    "version",
+    "timestamp",
+    "operation",
+    "operationParameters",
+).orderBy(F.col("version").desc()).show(20, truncate=80)
+```
+
+Para a distinção entre tabelas **geridas** e **externas** no Spark, e para o efeito de `DROP TABLE` sobre dados em `s3a://`, consultar a página [Tabelas gerenciadas vs não gerenciadas](tabelas_gerenciadas_vs_nao_gerenciadas.md).

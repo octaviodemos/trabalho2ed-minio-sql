@@ -4,6 +4,23 @@ A **Arquitetura Medalhão** é um padrão de design para Data Lakehouses que org
 
 ## Visão geral
 
+```mermaid
+flowchart LR
+    subgraph origem["Origem"]
+        SQL[(SQL Server\nBibliotecaDb)]
+    end
+    subgraph minio_landing["MinIO — Landing"]
+        LZ[Bucket landing-zone\nCSV por tabela]
+    end
+    subgraph minio_bronze["MinIO — Bronze"]
+        BR[Bucket bronze\nDelta Lake]
+    end
+    SQL -->|PySpark JDBC\nnotebook 01| LZ
+    LZ -->|schema + auditoria\nnotebook 02| BR
+```
+
+Fluxo resumido: **SQL Server** (origem relacional) → **CSV na Landing Zone** (MinIO, cópia fiel) → **Delta na Bronze** (MinIO, tipagem e metadados).
+
 ```
 ┌──────────────┐     ┌──────────────┐     ┌──────────────┐     ┌──────────────┐
 │  SQL Server  │────▶│   Landing    │────▶│    Bronze    │────▶│   Silver /   │

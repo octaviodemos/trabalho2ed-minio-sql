@@ -1,6 +1,8 @@
 site_name: "Trabalho 2 — Engenharia de Dados"
 site_description: "Documentação do projeto: Spark, Delta Lake, MinIO e SQL Server"
 site_author: "Equipe Trabalho 2"
+site_url: https://octaviodemos.github.io/trabalho2ed-minio-sql/
+repo_url: https://github.com/octaviodemos/trabalho2ed-minio-sql
 
 theme:
   name: material
@@ -28,7 +30,11 @@ theme:
 markdown_extensions:
   - admonition
   - pymdownx.details
-  - pymdownx.superfences
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_div_format
   - pymdownx.highlight:
       anchor_linenums: true
   - pymdownx.inlinehilite
@@ -41,5 +47,6 @@ markdown_extensions:
 nav:
   - Início: index.md
   - Arquitetura Medalhão: arquitetura_medallion.md
+  - Modelo ER (BibliotecaDb): modelo_er_biblioteca.md
   - Tabelas Gerenciadas vs Não Gerenciadas: tabelas_gerenciadas_vs_nao_gerenciadas.md
   - Camada Bronze: camada_bronze.md

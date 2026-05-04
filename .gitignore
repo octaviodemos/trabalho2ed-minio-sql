@@ -15,7 +15,12 @@ env/
 .mypy_cache/
 .ruff_cache/
 
+_delta_log/
+**/_delta_log/
+
 data/warehouse/
+data/_delta_log/
+data/**/_delta_log/
 data/iceberg_warehouse/
 data/delta_warehouse/
 data/minio_warehouse/

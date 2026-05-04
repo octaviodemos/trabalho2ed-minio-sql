@@ -12,8 +12,12 @@ dependencies = [
     "pyodbc>=5.1.0",
     "pyspark==3.5.3",
     "python-dotenv>=1.0.0",
+    "taskipy>=1.14.0",
 ]
 
 [tool.taskipy.tasks]
 notebook = "jupyter lab notebook/"
 jupyter = "jupyter lab notebook/"
+docs_build = "python run_mkdocs.py build"
+docs_serve = "python run_mkdocs.py serve"
+docs_deploy = "python run_mkdocs.py gh-deploy"
