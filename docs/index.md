@@ -2,6 +2,8 @@
 
 Este repositório documenta um pipeline de dados em ambiente académico: extração a partir do **Microsoft SQL Server**, armazenamento de ficheiros na **zona de aterragem** (*landing zone*) do **MinIO** (API compatível com S3) e materialização da camada **Bronze** em **Delta Lake**, processada com **Apache Spark** (PySpark).
 
+O enunciado da atividade, o checklist de requisitos (landing → bronze, DML, tabelas gerenciadas, repositório modelo, Delta sem Iceberg no T2) e o vínculo com o **Trabalho 1** estão descritos na página **[Enunciado (Trabalho 2)](enunciado.md)**.
+
 ## Fluxo de dados (origem à Bronze)
 
 O diagrama seguinte sintetiza as transições lógicas entre sistemas e formatos, alinhadas aos notebooks numerados na pasta `notebook/`.

@@ -46,6 +46,7 @@ markdown_extensions:
 
 nav:
   - Início: index.md
+  - Enunciado (Trabalho 2): enunciado.md
   - Arquitetura Medalhão: arquitetura_medallion.md
   - Modelo ER (BibliotecaDb): modelo_er_biblioteca.md
   - Tabelas Gerenciadas vs Não Gerenciadas: tabelas_gerenciadas_vs_nao_gerenciadas.md
