@@ -5,6 +5,7 @@ description = "Projeto de Engenharia de Dados com Spark, Delta Lake, MinIO e SQL
 readme = "README.md"
 requires-python = ">=3.11,<3.12"
 dependencies = [
+    "boto3>=1.35.0",
     "delta-spark==3.2.0",
     "jupyterlab>=4.0.0",
     "mkdocs-material>=9.7.6",

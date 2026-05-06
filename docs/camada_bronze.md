@@ -63,6 +63,8 @@ uv run jupyter lab notebook/
 !!! warning "Pré-requisito"
     Os notebooks `00_setup_sqlserver.ipynb` e `01_extracao_sqlserver_landing_zone.ipynb` devem ter sido executados com sucesso antes deste.
 
+O bucket **`bronze`** no MinIO deve existir antes da gravação Delta: o `docker compose` (serviço `minio-init`) e o próprio notebook **`02`** criam-no idempotentemente (API S3 com **boto3**). Consulte também [Pré-requisitos e configuração](prerequisitos.md).
+
 ---
 
 ## DML na Bronze — exemplos do `dml_bronze.ipynb`

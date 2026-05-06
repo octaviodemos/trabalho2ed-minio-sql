@@ -10,7 +10,12 @@ Projeto complementar ao Trabalho 1: infraestrutura em Docker (SQL Server 2025 + 
 
 - Docker e Docker Compose
 - [UV](https://docs.astral.sh/uv/) (Python 3.11)
-- **Dependências de sistema (Linux/Ubuntu)**:
+- **Dependências de sistema (Linux/Ubuntu)** para `pyodbc` no notebook `00`:
+  - **Base** (obrigatória): `unixodbc` e `unixodbc-dev`.
+  - **Driver SQL Server** — instale **uma** das opções abaixo. O notebook `00` escolhe automaticamente o primeiro driver disponível entre *ODBC Driver 18/17/13 for SQL Server* e *FreeTDS*; para forçar um nome concreto, defina `MSSQL_ODBC_DRIVER` no `.env` (ver `.env.example`).
+
+  **Opção A — Microsoft ODBC Driver 18** (ajuste `ubuntu/24.04` se usar outra LTS):
+
   ```bash
   sudo apt-get update && sudo apt-get install -y unixodbc unixodbc-dev
 
@@ -18,15 +23,22 @@ Projeto complementar ao Trabalho 1: infraestrutura em Docker (SQL Server 2025 + 
   curl https://packages.microsoft.com/config/ubuntu/24.04/prod.list | sudo tee /etc/apt/sources.list.d/mssql-release.list
   sudo apt-get update && sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18
   ```
-  (Necessário para conexões ODBC via `pyodbc` nos notebooks Jupyter.)
+
+  **Opção B — FreeTDS** (pacote `tdsodbc`):
+
+  ```bash
+  sudo apt-get update && sudo apt-get install -y unixodbc unixodbc-dev tdsodbc
+  ```
 
 ## 1. Variáveis de ambiente
+
+Copiar o modelo e editar valores reais:
 
 ```bash
 cp .env.example .env
 ```
 
-Editar `.env`: senha forte do SA (`MSSQL_SA_PASSWORD`), credenciais do MinIO e, se necessário, `MSSQL_JDBC_URL` ou `MINIO_S3_ENDPOINT` (por exemplo `http://127.0.0.1:9000` quando o notebook corre no anfitrião com a API MinIO exposta na porta `9000`).
+Incluir senha forte do SA (`MSSQL_SA_PASSWORD`), credenciais do MinIO e, se necessário, `MSSQL_JDBC_URL` ou `MINIO_S3_ENDPOINT` (por exemplo `http://127.0.0.1:9000` quando o notebook corre no anfitrião com a API MinIO exposta na porta `9000`). **Se a senha contiver o carácter `#`, coloque o valor entre aspas** — em ficheiros `.env`, `#` inicia comentário e trunca o valor (afetando também `MSSQL_SA_PASSWORD` passado ao Docker).
 
 ## 2. Subir a infraestrutura
 
@@ -40,7 +52,7 @@ docker compose up -d
 | MinIO API     | API compatível com S3   | `9000`               |
 | MinIO Console | Interface web           | `9001`               |
 
-O serviço `minio-init` cria o bucket `landing-zone` se ainda não existir.
+O serviço `minio-init` cria os buckets `landing-zone` e `bronze` se ainda não existirem. Os notebooks `01` e `02` complementam isso com criação idempotente via API S3 (**boto3**), útil quando o MinIO sobe sem o `minio-init` ou o serviço falha.
 
 ## 3. Ambiente Python (UV)
 
@@ -68,7 +80,15 @@ Publicação no GitHub Pages:
 uv run task docs_deploy
 ```
 
-O ficheiro `run_mkdocs.py` contorna uma limitação do **MkDocs 1.6** ao resolver o diretório do tema **Material** sem carregar o pacote `material` prematuramente. Se `uv run task docs_build` falhar com `No module named 'material.plugins'`, a instalação do `mkdocs-material` no `.venv` pode estar incompleta (ocorre por vezes em caminhos `/mnt/c` no WSL): apague a pasta `.venv` a partir do Explorador de ficheiros do Windows ou mova o projeto para um disco Linux nativo (`$HOME/...`) e execute `uv sync` de novo.
+O ficheiro `run_mkdocs.py` contorna uma limitação do **MkDocs 1.6** ao resolver o diretório do tema **Material** sem carregar o pacote `material` prematuramente.
+
+Se `uv run task docs_build` falhar com **`No module named 'material.plugins'`**, o pacote **mkdocs-material** no `.venv` ficou **incompleto** (falta a pasta `material/plugins` — comum em projetos sobre **`/mnt/c`** no WSL). Tente primeiro:
+
+```bash
+uv pip install --force-reinstall "mkdocs-material>=9.7.6"
+```
+
+Se continuar a falhar: apague `.venv`, volte a correr `uv sync`, ou clone o repositório para um caminho **Linux nativo** (`$HOME/...`). Detalhes na secção **MkDocs** em `docs/prerequisitos.md` (também no site gerado pelo MkDocs).
 
 ## Stack principal
 
@@ -77,6 +97,7 @@ O ficheiro `run_mkdocs.py` contorna uma limitação do **MkDocs 1.6** ao resolve
 - Apache Spark 3.5.3 (PySpark)
 - Delta Lake 3.2.0
 - Python 3.11 + UV
+- **boto3** (criação de buckets MinIO a partir dos notebooks, alinhada ao `minio-init`)
 
 ---
 
