@@ -2,26 +2,30 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://octaviodemos.github.io/trabalho2ed-minio-sql/</loc>
-         <lastmod>2026-05-05</lastmod>
+         <lastmod>2026-05-07</lastmod>
     </url>
     <url>
          <loc>https://octaviodemos.github.io/trabalho2ed-minio-sql/arquitetura_medallion/</loc>
-         <lastmod>2026-05-05</lastmod>
+         <lastmod>2026-05-07</lastmod>
     </url>
     <url>
          <loc>https://octaviodemos.github.io/trabalho2ed-minio-sql/camada_bronze/</loc>
-         <lastmod>2026-05-05</lastmod>
+         <lastmod>2026-05-07</lastmod>
     </url>
     <url>
          <loc>https://octaviodemos.github.io/trabalho2ed-minio-sql/enunciado/</loc>
-         <lastmod>2026-05-05</lastmod>
+         <lastmod>2026-05-07</lastmod>
     </url>
     <url>
          <loc>https://octaviodemos.github.io/trabalho2ed-minio-sql/modelo_er_biblioteca/</loc>
-         <lastmod>2026-05-05</lastmod>
+         <lastmod>2026-05-07</lastmod>
+    </url>
+    <url>
+         <loc>https://octaviodemos.github.io/trabalho2ed-minio-sql/prerequisitos/</loc>
+         <lastmod>2026-05-07</lastmod>
     </url>
     <url>
          <loc>https://octaviodemos.github.io/trabalho2ed-minio-sql/tabelas_gerenciadas_vs_nao_gerenciadas/</loc>
-         <lastmod>2026-05-05</lastmod>
+         <lastmod>2026-05-07</lastmod>
     </url>
 </urlset>

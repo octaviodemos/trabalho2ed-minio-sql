@@ -242,6 +242,25 @@
   
   
     <li class="md-tabs__item">
+      <a href="../prerequisitos/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Pré-requisitos e configuração
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
       <a href="../enunciado/" class="md-tabs__link">
         
   
@@ -393,6 +412,33 @@
     
   
     Início
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../prerequisitos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pré-requisitos e configuração
   
 
     
@@ -967,6 +1013,7 @@
 <p class="admonition-title">Pré-requisito</p>
 <p>Os notebooks <code>00_setup_sqlserver.ipynb</code> e <code>01_extracao_sqlserver_landing_zone.ipynb</code> devem ter sido executados com sucesso antes deste.</p>
 </div>
+<p>O bucket <strong><code>bronze</code></strong> no MinIO deve existir antes da gravação Delta: o <code>docker compose</code> (serviço <code>minio-init</code>) e o próprio notebook <strong><code>02</code></strong> criam-no idempotentemente (API S3 com <strong>boto3</strong>). Consulte também <a href="../prerequisitos/">Pré-requisitos e configuração</a>.</p>
 <hr />
 <h2 id="dml-na-bronze-exemplos-do-dml_bronzeipynb">DML na Bronze — exemplos do <code>dml_bronze.ipynb</code></h2>
 <p>Após a carga Delta no MinIO, o notebook <code>dml_bronze.ipynb</code> demonstra mutações sobre o caminho <code>s3a://bronze/dbo_Categoria/</code> e a leitura do registo transacional do Delta. Os excertos abaixo reproduzem a lógica principal; o caminho e a variável <code>novo_id</code> devem estar coerentes com a execução sequencial das células do notebook.</p>

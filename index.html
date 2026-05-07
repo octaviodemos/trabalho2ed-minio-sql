@@ -16,7 +16,7 @@
       
       
       
-        <link rel="next" href="enunciado/">
+        <link rel="next" href="prerequisitos/">
       
       
         
@@ -244,6 +244,25 @@
   
   
     <li class="md-tabs__item">
+      <a href="prerequisitos/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Pré-requisitos e configuração
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
       <a href="enunciado/" class="md-tabs__link">
         
   
@@ -456,6 +475,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#ambiente-odbc-e-buckets-minio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ambiente, ODBC e buckets MinIO
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#stack-principal" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -492,6 +522,33 @@
   
 </nav>
       
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="prerequisitos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pré-requisitos e configuração
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -669,6 +726,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#ambiente-odbc-e-buckets-minio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ambiente, ODBC e buckets MinIO
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#stack-principal" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -734,6 +802,12 @@
     SQL --&gt;|"Extração JDBC / serialização CSV\n(notebook 01)"| LZ
     LZ --&gt;|"Processamento Spark + Delta\n(notebook 02)"| BR</div>
 <p>A etapa <strong>00</strong> prepara o esquema relacional e dados de referência no SQL Server; a etapa <strong>01</strong> exporta tabelas para CSV no MinIO; a etapa <strong>02</strong> aplica <em>schema enforcement</em>, metadados de auditoria e gravação transacional Delta na Bronze. O notebook <strong>dml_bronze.ipynb</strong> ilustra operações de manutenção e consulta ao histórico sobre uma tabela Delta já presente no <em>bucket</em> <code>bronze</code>.</p>
+<h2 id="ambiente-odbc-e-buckets-minio">Ambiente, ODBC e buckets MinIO</h2>
+<ul>
+<li><strong><code>.env</code></strong>: utilizar o ficheiro <strong><code>.env.example</code></strong> na raiz como modelo (<code>cp .env.example .env</code>). Valores com o carácter <strong><code>#</code></strong> devem ir <strong>entre aspas</strong>, senão o restante da linha é interpretado como comentário (incluindo a senha do SA no Docker e no JDBC).</li>
+<li><strong>ODBC (notebook <code>00</code>)</strong>: no Linux, instalar <code>unixodbc</code> e <strong>um</strong> driver para SQL Server — <em>Microsoft ODBC 18</em> <strong>ou</strong> <em>FreeTDS</em> (<code>tdsodbc</code>). O notebook deteta automaticamente o driver, salvo definição explícita de <code>MSSQL_ODBC_DRIVER</code>.</li>
+<li><strong>Buckets <code>landing-zone</code> e <code>bronze</code></strong>: o serviço Docker <strong><code>minio-init</code></strong> cria ambos; os notebooks <strong><code>01</code></strong> e <strong><code>02</code></strong> garantem a mesma existência via API S3 (<strong>boto3</strong>), como redundância quando o init não corre.</li>
+</ul>
 <h2 id="stack-principal">Stack principal</h2>
 <table>
 <thead>
@@ -784,17 +858,17 @@
 <tr>
 <td>00</td>
 <td><code>00_setup_sqlserver.ipynb</code></td>
-<td>Criação do <code>BibliotecaDb</code> e carga a partir dos CSV de referência</td>
+<td>Criação do <code>BibliotecaDb</code> e carga a partir dos CSV de referência (deteção automática do driver ODBC no Linux)</td>
 </tr>
 <tr>
 <td>01</td>
 <td><code>01_extracao_sqlserver_landing_zone.ipynb</code></td>
-<td>Extração SQL Server → CSV no <em>bucket</em> <code>landing-zone</code></td>
+<td>Extração SQL Server → CSV no <em>bucket</em> <code>landing-zone</code>; garante o bucket MinIO antes da escrita</td>
 </tr>
 <tr>
 <td>02</td>
 <td><code>02_landing_to_bronze_delta.ipynb</code></td>
-<td>Leitura dos CSV, conformação de <em>schema</em> e gravação Delta no <em>bucket</em> <code>bronze</code></td>
+<td>Leitura dos CSV, conformação de <em>schema</em>, gravação Delta no <em>bucket</em> <code>bronze</code>; garante buckets MinIO (<code>landing-zone</code>, <code>bronze</code>) antes da ingestão</td>
 </tr>
 <tr>
 <td>03</td>
@@ -809,7 +883,7 @@
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>uv<span class="w"> </span>run<span class="w"> </span>jupyter<span class="w"> </span>lab<span class="w"> </span>notebook/
 </code></pre></div>
 <p>Recomenda-se executar os notebooks <strong>00 → 01 → 02</strong> na primeira montagem do ambiente; o notebook <strong>03</strong> pressupõe tabelas Delta já existentes em <code>s3a://bronze/</code>.</p>
-<p>Para consultar a documentação estática gerada pelo MkDocs, utilizar <code>uv run task docs_serve</code> na raiz do repositório.</p>
+<p>Para consultar a documentação estática gerada pelo MkDocs, utilizar <code>uv run task docs_serve</code> na raiz do repositório. Detalhes de ODBC, <code>.env</code> e buckets MinIO estão na página <strong><a href="prerequisitos/">Pré-requisitos e configuração</a></strong>.</p>
 
 
 

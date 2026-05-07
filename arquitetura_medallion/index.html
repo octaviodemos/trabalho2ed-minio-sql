@@ -244,6 +244,25 @@
   
   
     <li class="md-tabs__item">
+      <a href="../prerequisitos/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Pré-requisitos e configuração
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
       <a href="../enunciado/" class="md-tabs__link">
         
   
@@ -395,6 +414,33 @@
     
   
     Início
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../prerequisitos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pré-requisitos e configuração
   
 
     
@@ -808,6 +854,7 @@
 <li><strong>Bucket MinIO</strong>: <code>landing-zone</code></li>
 <li><strong>Objetivo</strong>: Cópia fiel dos dados extraídos do SQL Server, sem transformação</li>
 <li><strong>Notebook</strong>: <code>01_extracao_sqlserver_landing_zone.ipynb</code></li>
+<li><strong>Infraestrutura</strong>: o bucket é criado pelo <code>minio-init</code> no Docker e, em redundância, pelo próprio notebook via API S3 (<strong>boto3</strong>)</li>
 </ul>
 <h3 id="bronze">Bronze</h3>
 <ul>
@@ -815,6 +862,7 @@
 <li><strong>Bucket MinIO</strong>: <code>bronze</code></li>
 <li><strong>Objetivo</strong>: Dados com tipagem forte, schema enforcement e metadados de auditoria</li>
 <li><strong>Notebook</strong>: <code>02_landing_to_bronze_delta.ipynb</code></li>
+<li><strong>Infraestrutura</strong>: o bucket é criado pelo <code>minio-init</code> no Docker e, em redundância, pelo notebook <strong><code>02</code></strong> (API S3 com <strong>boto3</strong>) antes da ingestão Delta</li>
 <li><strong>Colunas adicionais</strong>: <code>_bronze_loaded_at</code>, <code>_bronze_source_file</code></li>
 </ul>
 <h3 id="silver-futuro">Silver <em>(futuro)</em></h3>
